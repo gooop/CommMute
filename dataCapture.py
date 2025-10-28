@@ -3,11 +3,10 @@ import os
 import datetime
 from PIL import ImageGrab
 
-
 # Create the main window
 window = tk.Tk()
 window.title("Data Capture")
-window.geometry("200x200")
+window.geometry("200x350")
 
 # Create a frame to hold the buttons and space them evenly
 button_frame = tk.Frame(window)
@@ -20,6 +19,7 @@ button_height = 3
 is_capturing = False
 cancel_commercial_capture = False
 cancel_game_capture = False
+minimize_after_capture = True
 
 
 
@@ -61,7 +61,8 @@ def handle_capture_commercial_press():
     capture_commercial_button.config(state="disabled")
     capture_game_button.config(state="disabled")
     capture_commercial_button.config(bg="green")
-    window.after(1000, window.iconify)  # Minimize after 1 second
+    if (minimize_after_capture): 
+        window.after(1000, window.iconify)  # Minimize after 1 second
     capture_commercial_loop()  # Start the loop
 
 def capture_game_loop():
@@ -80,7 +81,8 @@ def handle_capture_game_press():
     capture_commercial_button.config(state="disabled")
     capture_game_button.config(state="disabled")
     capture_game_button.config(bg="green")
-    window.after(1000, window.iconify)  # Minimize after 1 second
+    if (minimize_after_capture): 
+        window.after(1000, window.iconify)  # Minimize after 1 second
     capture_game_loop()
 
 def try_stop_capture():
@@ -99,6 +101,12 @@ def on_window_deiconify(event):
     try_stop_capture()
 
 window.bind("<Map>", on_window_deiconify)
+
+# Helpers
+def toggle_minimize_after_capture():
+    global minimize_after_capture
+    print("toggling minimize_after_capture" + str(minimize_after_capture))
+    minimize_after_capture = not minimize_after_capture
 
 # Display Elements:
 
@@ -120,9 +128,17 @@ capture_game_button = tk.Button(
 )
 capture_game_button.pack(pady=5)  # Vertical spacing between buttons
 
+minimize_checkbox_status = tk.BooleanVar(value=minimize_after_capture)
+minimize_checkbox = tk.Checkbutton(
+    window,
+    text="Minimize window on capture",
+    command=toggle_minimize_after_capture,
+    variable=minimize_checkbox_status
+).pack()
+
 info_label = tk.Label(
     window,
-    text="Window auto-minimizes on capture start; capturing stops when reopened.",
+    text="Window can auto-minimize on capture start; capturing stops when reopened.",
     wraplength=180,
     justify="center"
 )
